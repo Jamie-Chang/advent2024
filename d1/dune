@@ -1,0 +1,4 @@
+(executable
+ (public_name day1)
+ (name d1)
+ (libraries advent2024))
