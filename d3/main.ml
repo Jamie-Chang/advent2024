@@ -27,12 +27,14 @@ let regex = Re.(compile (alt [ str "don't"; str "do"; mul_expression ]))
 
 let parse_group group =
   let op_string = Re.Group.get group 0 in
-  if String.starts_with ~prefix:"mul" op_string then
-    Mul
-      ( Re.Group.get group 1 |> int_of_string,
-        Re.Group.get group 2 |> int_of_string )
-  else if op_string = "don't" then Dont
-  else Do
+  match op_string with
+  | "don't" -> Dont
+  | "do" -> Do
+  | s when String.starts_with ~prefix:"mul" s ->
+      Mul
+        ( Re.Group.get group 1 |> int_of_string,
+          Re.Group.get group 2 |> int_of_string )
+  | _ -> failwith "unexpected pattern"
 
 let get_ops text = Re.Seq.all regex text |> of_seq |> map parse_group
 
