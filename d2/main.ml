@@ -1,5 +1,4 @@
 open Iter
-module IntMap = Map.Make (Int)
 
 let parse_line x =
   String.split_on_char ' ' x
