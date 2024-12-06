@@ -108,7 +108,7 @@ let detect_loop nodes =
   in
   recurse IntPairPairSet.empty edges
 
-let part2 filename =
+let part2 ?(parallel = false) filename =
   let dimension, starting, obstructions =
     In_channel.with_open_text filename (fun ic -> read_lines ic |> parse)
   in
@@ -119,10 +119,17 @@ let part2 filename =
   let traverse_with obstruction =
     traverse (dimension, starting, IntPairSet.add obstruction obstructions)
   in
-  IntPairSet.to_seq all_nodes
-  |> Seq.filter (fun obstruction -> traverse_with obstruction |> detect_loop)
-  |> Seq.length
+  if parallel then
+    Parmap.L (IntPairSet.to_list all_nodes)
+    |> Parmap.parmap (fun obstruction ->
+           traverse_with obstruction |> detect_loop)
+    |> List.filter (fun a -> a)
+    |> List.length
+  else
+    IntPairSet.to_seq all_nodes
+    |> Seq.filter (fun obstruction -> traverse_with obstruction |> detect_loop)
+    |> Seq.length
 ;;
 
 part1 "inputs/d6.txt" |> string_of_int |> print_endline;;
-part2 "inputs/d6.txt" |> string_of_int |> print_endline
+part2 ~parallel:true "inputs/d6.txt" |> string_of_int |> print_endline
