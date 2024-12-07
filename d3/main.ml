@@ -1,4 +1,4 @@
-open Iter
+open Advent2024
 
 let read_file file = In_channel.with_open_bin file In_channel.input_all
 
@@ -9,13 +9,15 @@ let mul_expression =
 let regex = Re.compile mul_expression
 
 let operations content =
-  Re.Seq.all regex content |> of_seq
-  |> map (fun group ->
+  Re.Seq.all regex content
+  |> Seq.map (fun group ->
          ( Re.Group.get group 1 |> int_of_string,
            Re.Group.get group 2 |> int_of_string ))
 
 let part1 filename =
-  read_file filename |> operations |> map (fun (x, y) -> x * y) |> sum
+  read_file filename |> operations
+  |> Seq.map (fun (x, y) -> x * y)
+  |> Common.Seq.sum
 ;;
 
 part1 "inputs/d3.txt" |> string_of_int |> print_endline
@@ -36,7 +38,7 @@ let parse_group group =
           Re.Group.get group 2 |> int_of_string )
   | _ -> failwith "unexpected pattern"
 
-let get_ops text = Re.Seq.all regex text |> of_seq |> map parse_group
+let get_ops text = Re.Seq.all regex text |> Seq.map parse_group
 
 let run_ops ops =
   let run_op (total, state) op =
@@ -46,7 +48,7 @@ let run_ops ops =
     | Disabled, _ -> (total, Disabled)
     | Enabled, Mul (x, y) -> (total + (x * y), Enabled)
   in
-  fold run_op (0, Enabled) ops
+  Seq.fold_left run_op (0, Enabled) ops
 
 let part2 filename =
   read_file filename |> get_ops |> run_ops |> fun (total, _) -> total
