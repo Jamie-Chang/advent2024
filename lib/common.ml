@@ -2,6 +2,7 @@ module StdList = List
 
 module List = struct
   let sum = StdList.fold_left ( + ) 0
+  let parmap f lst = Parmap.L lst |> Parmap.parmap f
 end
 
 module Seq = struct

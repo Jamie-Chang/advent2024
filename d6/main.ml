@@ -105,7 +105,8 @@ let detect_loop nodes =
 
 let part2 ?(parallel = false) filename =
   let dimension, starting, obstructions =
-    In_channel.with_open_text filename @@ Fun.compose parse Common.Seq.read_lines
+    In_channel.with_open_text filename
+    @@ Fun.compose parse Common.Seq.read_lines
   in
   let all_nodes =
     traverse (dimension, starting, obstructions)
@@ -115,8 +116,8 @@ let part2 ?(parallel = false) filename =
     traverse (dimension, starting, IntPairSet.add obstruction obstructions)
   in
   if parallel then
-    Parmap.L (IntPairSet.to_list all_nodes)
-    |> Parmap.parmap @@ Fun.compose detect_loop traverse_with
+    IntPairSet.to_list all_nodes
+    |> Common.List.parmap @@ Fun.compose detect_loop traverse_with
     |> List.filter Fun.id |> List.length
   else
     IntPairSet.to_seq all_nodes
@@ -124,5 +125,6 @@ let part2 ?(parallel = false) filename =
     |> Seq.length
 ;;
 
-part1 "inputs/d6.txt" |> string_of_int |> print_endline;;
-part2 ~parallel:true "inputs/d6.txt" |> string_of_int |> print_endline
+let filename = "inputs/d6.txt";;
+assert (part1 filename = 4883) ;;
+assert (part2 ~parallel:true filename = 1655) ;;

@@ -1,4 +1,4 @@
 (library
  (name advent2024)
  (modules common)
- (libraries re))
+ (libraries re parmap))

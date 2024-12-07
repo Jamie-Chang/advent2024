@@ -1,4 +1,4 @@
 (executable
  (public_name day6)
  (name main)
- (libraries advent2024 parmap))
+ (libraries advent2024))
