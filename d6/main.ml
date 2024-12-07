@@ -1,3 +1,5 @@
+open Advent2024
+
 module IntPairSet = Set.Make (struct
   type t = int * int
 
@@ -9,14 +11,6 @@ module IntPairPairSet = Set.Make (struct
 
   let compare = compare
 end)
-
-let read_lines ic =
-  let rec lines_rec ic () =
-    match In_channel.input_line ic with
-    | Some value -> Seq.Cons (value, lines_rec ic)
-    | None -> Seq.Nil
-  in
-  lines_rec ic
 
 let parse lines =
   let coords =
@@ -72,16 +66,17 @@ let traverse (dimension, starting, obstructions) =
     | x, y -> x < x_bound && y < y_bound && x >= 0 && y >= 0
   in
 
+  let obstructed coord = IntPairSet.mem coord obstructions in
+
   let rec tranverse_rec direction coord () =
-    if not (in_bound coord) then Seq.Nil
+    if not @@ in_bound coord then Seq.Nil
     else
       let all_moves =
         directions direction |> Seq.map (fun d -> (d, move d coord))
       in
       let next_move =
         Seq.find
-          (function
-            | _, new_coord -> not (IntPairSet.mem new_coord obstructions))
+          (function _, new_coord -> not @@ obstructed new_coord)
           all_moves
       in
 
@@ -95,11 +90,11 @@ let traverse (dimension, starting, obstructions) =
 let _format_tuple (x, y) = "(" ^ string_of_int x ^ ", " ^ string_of_int y ^ ")"
 
 let part1 filename =
-  In_channel.with_open_text filename (fun ic -> read_lines ic |> parse)
+  In_channel.with_open_text filename @@ Fun.compose parse Common.Seq.read_lines
   |> traverse |> IntPairSet.of_seq |> IntPairSet.to_seq |> Seq.length
 
 let detect_loop nodes =
-  let edges = Seq.zip nodes (Seq.drop 1 nodes) in
+  let edges = Seq.zip nodes @@ Seq.drop 1 nodes in
   let rec recurse set seq =
     match Seq.uncons seq with
     | Some (v, _) when IntPairPairSet.mem v set -> true
@@ -110,7 +105,7 @@ let detect_loop nodes =
 
 let part2 ?(parallel = false) filename =
   let dimension, starting, obstructions =
-    In_channel.with_open_text filename (fun ic -> read_lines ic |> parse)
+    In_channel.with_open_text filename @@ Fun.compose parse Common.Seq.read_lines
   in
   let all_nodes =
     traverse (dimension, starting, obstructions)
@@ -121,13 +116,11 @@ let part2 ?(parallel = false) filename =
   in
   if parallel then
     Parmap.L (IntPairSet.to_list all_nodes)
-    |> Parmap.parmap (fun obstruction ->
-           traverse_with obstruction |> detect_loop)
-    |> List.filter (fun a -> a)
-    |> List.length
+    |> Parmap.parmap @@ Fun.compose detect_loop traverse_with
+    |> List.filter Fun.id |> List.length
   else
     IntPairSet.to_seq all_nodes
-    |> Seq.filter (fun obstruction -> traverse_with obstruction |> detect_loop)
+    |> Seq.filter (Fun.compose detect_loop traverse_with)
     |> Seq.length
 ;;
 

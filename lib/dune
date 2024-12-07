@@ -1,3 +1,4 @@
 (library
  (name advent2024)
- (libraries iter re parmap))
+ (modules common)
+ (libraries iter re))
