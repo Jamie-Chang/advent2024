@@ -43,10 +43,20 @@ module Seq = struct
       let take seqs = seqs |> Seq.map first in
       let drop seqs = seqs |> Seq.map @@ Seq.drop 1 in
       let column = take seqs in
-      let flattened = StdList.concat @@ StdList.of_seq column in 
-      if flattened <> [] then
-        Seq.Cons (flattened, zip_rec @@ drop seqs)
+      let flattened = StdList.concat @@ StdList.of_seq column in
+      if flattened <> [] then Seq.Cons (flattened, zip_rec @@ drop seqs)
       else Seq.Nil
     in
     zip_rec seq
+
+  let product_n seq_of_seq =
+    let product acc seq =
+      Seq.product acc seq
+      |> Seq.map (fun (rest, v) -> v :: rest)
+      |> Seq.map StdList.rev
+    in
+    match Seq.uncons seq_of_seq with
+    | Some (head, tail) ->
+        Seq.fold_left product (Seq.map (fun a -> [ a ]) head) tail
+    | None -> failwith "empty sequence"
 end
