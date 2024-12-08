@@ -61,3 +61,29 @@ module Seq = struct
         Seq.fold_left product (Seq.map (fun a -> [ a ]) head) tail
     | None -> failwith "empty sequence"
 end
+
+module IntPair = struct
+  let origin = (0, 0)
+  let ( - ) (a, b) (c, d) = (a - c, b - d)
+  let ( + ) (a, b) (c, d) = (a + c, b + d)
+  let ( * ) (a, b) n = (a * n, b * n)
+  let ( ~- ) (a, b) = (~-a, ~-b)
+  let ( < ) (a, b) (c, d) = a < c && b < d
+  let ( <= ) (a, b) (c, d) = a <= c && b <= d
+  let ( > ) (a, b) (c, d) = a > c && b > d
+  let ( >= ) (a, b) (c, d) = a >= c && b >= d
+
+  let reduce (a, b) =
+    let rec gcd a b = if b = 0 then a else gcd b (a mod b) in
+    let factor = gcd a b in
+    (a / factor, b / factor)
+  ;;
+
+  assert (origin = (0, 0));;
+  assert ((1, 2) > (0, 0));;
+  assert ((1, 2) <= (1, 2));;
+  assert ((1, 2) - (0, 0) = (1, 2));;
+  assert ((1, 2) + (1, 1) = (2, 3));;
+  assert (-(1, 1) = (-1, -1));;
+  assert (reduce (5, 10) = (1, 2))
+end
