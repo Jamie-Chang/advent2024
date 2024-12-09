@@ -77,7 +77,8 @@ module IntPair = struct
     let rec gcd a b = if b = 0 then a else gcd b (a mod b) in
     let factor = gcd a b in
     (a / factor, b / factor)
-  ;;
+
+  let to_string (a, b) = "(" ^ string_of_int a ^ ", " ^ string_of_int b ^ ")";;
 
   assert (origin = (0, 0));;
   assert ((1, 2) > (0, 0));;
