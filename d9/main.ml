@@ -106,14 +106,14 @@ let fill_v2 file_stack slot =
   let file_stack, result_stack, skipped_files =
     fill_v2_aux (file_stack, [], []) slot
   in
-  (List.rev skipped_files @ file_stack, List.rev result_stack)
+  (List.rev_append skipped_files file_stack, List.rev result_stack)
 
 let _debug_result seq =
   seq
   |> Seq.map Common.IntPair.to_string
   |> List.of_seq |> String.concat " " |> print_endline
 
-let _print_result seq = seq |> checksum |> string_of_int |> print_endline
+let print_result seq = seq |> checksum |> string_of_int |> print_endline
 
 let part2 filename =
   let raw =
@@ -143,4 +143,4 @@ let part2 filename =
 let _filename = "inputs/d9.txt";;
 
 part1 _filename |> string_of_int |> print_endline;;
-part2 _filename |> _print_result
+part2 _filename |> print_result

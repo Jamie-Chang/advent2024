@@ -1,5 +1,9 @@
 module StdList = List
 
+module Fun = struct
+  let ($) = Fun.compose
+end
+
 module List = struct
   let sum = StdList.fold_left ( + ) 0
   let parmap f lst = Parmap.L lst |> Parmap.parmap f
