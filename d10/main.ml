@@ -1,14 +1,8 @@
 open Advent2024
 
-module IntPair = struct
-  type t = int * int
 
-  let compare (x1, y1) (x2, y2) =
-    match Stdlib.compare x1 x2 with 0 -> Stdlib.compare y1 y2 | c -> c
-end
-
-module IntPairMap = Map.Make (IntPair)
-module IntPairSet = Set.Make (IntPair)
+module IntPairMap = Map.Make (Common.IntPair)
+module IntPairSet = Set.Make (Common.IntPair)
 
 let parse_topograph lines =
   let parse_char c = int_of_char c |> fun i -> i - 48 in

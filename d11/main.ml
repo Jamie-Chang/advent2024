@@ -1,4 +1,5 @@
-open Advent2024
+open Advent2024.Common
+module IntCounter = Counter.Make (Int)
 
 let blink num =
   if num = 0 then Seq.return 1
@@ -12,60 +13,22 @@ let blink num =
       ]
       |> List.to_seq
     else Seq.return @@ (num * 2024)
-;;
 
-assert (blink 20 |> List.of_seq = [ 2; 0 ]);;
-assert (blink 0 |> List.of_seq = [ 1 ]);;
-assert (blink 1 |> List.of_seq = [ 2024 ])
-
-let rec blink_n n seq =
-  if n = 0 then seq else blink_n (n - 1) @@ Seq.flat_map blink seq
-;;
-
-assert (blink_n 25 (List.to_seq [ 125; 17 ]) |> Seq.length = 55312)
-
-let parse raw =
-  String.split_on_char ' ' raw |> List.to_seq |> Seq.map int_of_string
-
-let part1 filename =
-  In_channel.with_open_text filename In_channel.input_all
-  |> parse |> blink_n 25 |> Seq.length
-;;
-
-part1 "inputs/d11.txt" |> string_of_int |> print_endline
-
-let blink_n_memoi n v = Seq.return v |> blink_n n |> Seq.memoize
-
-let solve items =
-  let first_pass = Seq.map (blink_n_memoi 25) items in
-  let cached = Hashtbl.of_seq (Seq.zip items first_pass) in
-  let second_pass =
-    Seq.concat first_pass
-    |> Seq.map @@ fun n ->
-       if Hashtbl.mem cached n then Hashtbl.find cached n
-       else
-         let res = blink_n_memoi 25 n in
-         Hashtbl.add cached n res;
-         res
+let solve iters stones =
+  let stones = IntCounter.of_value_seq stones in
+  let blink_one = Fun.memo @@ Fun.compose IntCounter.of_value_seq blink in
+  let blink_all stones =
+    IntCounter.to_seq stones
+    |> Seq.map (fun (k, v) -> IntCounter.(v * blink_one k))
+    |> Seq.fold_left IntCounter.merge IntCounter.empty
   in
-  let cached_size =
-    Hashtbl.to_seq cached
-    |> Seq.map (fun (k, v) -> (k, Seq.length v))
-    |> Hashtbl.of_seq
-  in
-  let sizes =
-    Seq.concat second_pass
-    |> Seq.map @@ fun n ->
-       if Hashtbl.mem cached_size n then Hashtbl.find cached_size n
-       else
-         let res = blink_n_memoi 25 n |> Seq.length in
-         Hashtbl.add cached_size n res;
-         res
-  in
-  Common.Seq.sum sizes
+  Fun.recurse iters blink_all stones |> IntCounter.total
 
-let part2 filename =
-  In_channel.with_open_text filename In_channel.input_all |> parse |> solve
-;;
+let parse a =
+  a |> String.split_on_char ' ' |> List.to_seq |> Seq.map int_of_string
 
-part2 "inputs/d11.txt" |> string_of_int |> print_endline
+let _ =
+  let file = "inputs/d11.txt" in
+  let stones = In_channel.with_open_text file In_channel.input_all |> parse in
+  let result = (solve 25 stones, solve 75 stones) in
+  IntPair.to_string result |> print_endline

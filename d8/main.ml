@@ -1,11 +1,6 @@
 open Advent2024
 module CharMap = Map.Make (Char)
-
-module IntPairSet = Set.Make (struct
-  type t = int * int
-
-  let compare = compare
-end)
+module IntPairSet = Set.Make (Common.IntPair)
 
 let uniq_length seq = IntPairSet.of_seq seq |> IntPairSet.to_seq |> Seq.length
 
@@ -58,14 +53,12 @@ let part1 filename =
            List.to_seq locations |> combinations
            |> Seq.flat_map calculate_antinodes)
   in
-  antinodes
-  |> Seq.filter (fun c -> Common.IntPair.(origin <= c && c < bound))
-  |> uniq_length
+  antinodes |> Seq.filter (fun c -> Common.IntPair.bound bound c) |> uniq_length
 
 let part2 filename =
   In_channel.with_open_text filename @@ fun ic ->
   let bound, antennas = parse @@ Common.Seq.read_lines ic in
-  let in_bound v = Common.IntPair.(v >= origin && v < bound) in
+  let in_bound = Common.IntPair.bound bound in
   let ray start delta = ray start delta |> Seq.take_while in_bound in
   let antinodes (s, e) =
     Common.IntPair.(
