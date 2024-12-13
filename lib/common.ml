@@ -133,6 +133,8 @@ module IntPair = struct
     (a / factor, b / factor)
 
   let to_string (a, b) = "(" ^ string_of_int a ^ ", " ^ string_of_int b ^ ")"
+
+  let of_list = function a :: b :: [] -> (a, b) | _ -> failwith "invalid argument"
 end
 
 module Counter = struct
