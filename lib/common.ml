@@ -28,6 +28,22 @@ module Seq = struct
 
   let sum = Seq.fold_left ( + ) 0
 
+  let max cmp seq =
+    match Seq.uncons seq with
+    | None -> failwith "empty sequence"
+    | Some (start, rest) ->
+        Seq.fold_left
+          (fun curr next -> if cmp curr next = -1 then next else curr)
+          start rest
+
+  let min cmp seq =
+    match Seq.uncons seq with
+    | None -> failwith "empty sequence"
+    | Some (start, rest) ->
+        Seq.fold_left
+          (fun curr next -> if cmp curr next = 1 then next else curr)
+          start rest
+
   let read_lines ic =
     let rec lines_rec ic () =
       match In_channel.input_line ic with
@@ -86,6 +102,19 @@ module IntPair = struct
   type t = int * int
 
   let origin = (0, 0)
+  let up = (-1, 0)
+  let down = (1, 0)
+  let left = (0, -1)
+  let right = (0, 1)
+  let directions = [ up; down; left; right ] |> List.to_seq
+
+  let orthogonal = function
+    | -1, 0 -> (left, right)
+    | 1, 0 -> (right, left)
+    | 0, -1 -> (up, down)
+    | 0, 1 -> (down, up)
+    | _ -> failwith "unexpected direction"
+
   let ( - ) (a, b) (c, d) = (a - c, b - d)
   let ( + ) (a, b) (c, d) = (a + c, b + d)
   let ( * ) (a, b) n = (a * n, b * n)
@@ -103,7 +132,7 @@ module IntPair = struct
     let factor = gcd a b in
     (a / factor, b / factor)
 
-  let to_string (a, b) = "(" ^ string_of_int a ^ ", " ^ string_of_int b ^ ")";;
+  let to_string (a, b) = "(" ^ string_of_int a ^ ", " ^ string_of_int b ^ ")"
 end
 
 module Counter = struct

@@ -25,7 +25,6 @@ let find_bound topograph =
   | None -> failwith "empty topograph"
 
 let moves coord =
-  let directions = [ (1, 0); (0, 1); (0, -1); (-1, 0) ] |> List.to_seq in
   let open Common.IntPair in
   directions |> Seq.map @@ ( + ) coord
 
