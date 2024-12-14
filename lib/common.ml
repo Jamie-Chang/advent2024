@@ -44,6 +44,11 @@ module Seq = struct
           (fun curr next -> if cmp curr next = 1 then next else curr)
           start rest
 
+  let nth seq n =
+    match drop n seq |> uncons with
+    | Some (v, _) -> v
+    | None -> failwith "invalid sequence"
+
   let read_lines ic =
     let rec lines_rec ic () =
       match In_channel.input_line ic with
@@ -133,8 +138,8 @@ module IntPair = struct
     (a / factor, b / factor)
 
   let to_string (a, b) = "(" ^ string_of_int a ^ ", " ^ string_of_int b ^ ")"
-
-  let of_list = function a :: b :: [] -> (a, b) | _ -> failwith "invalid argument"
+  let of_list = function [ a; b ] -> (a, b) | _ -> failwith "invalid argument"
+  let ( / ) (a, b) n = (a / n, b / n)
 end
 
 module Counter = struct
