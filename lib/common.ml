@@ -44,6 +44,14 @@ module Seq = struct
           (fun curr next -> if cmp curr next = 1 then next else curr)
           start rest
 
+  let min_opt seq =
+    Seq.fold_left
+      (fun acc v ->
+        match acc with
+        | None -> Some v
+        | Some acc -> if v < acc then Some v else Some acc)
+      None seq
+
   let nth seq n =
     match drop n seq |> uncons with
     | Some (v, _) -> v
