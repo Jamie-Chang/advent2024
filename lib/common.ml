@@ -21,6 +21,10 @@ module List = struct
 
   let sum = List.fold_left ( + ) 0
   let parmap f lst = Parmap.L lst |> Parmap.parmap f
+
+  let rec drop n =
+    if n = 0 then Fun.id
+    else function _ :: rest -> drop (n - 1) rest | _ -> failwith "empty list"
 end
 
 module Seq = struct
