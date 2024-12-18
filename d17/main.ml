@@ -48,7 +48,7 @@ let execute (registers, program) =
         in
         execute (write "A" result, rest) stdout
     | 1 :: n :: rest ->
-      let result = Int.logxor (reg "B") n in
+        let result = Int.logxor (reg "B") n in
         execute (write "B" result, rest) stdout
     | 2 :: n :: rest -> execute (combo n mod 8 |> write "B", rest) stdout
     | 3 :: n :: rest ->
@@ -78,7 +78,36 @@ let execute (registers, program) =
   execute (registers, program) []
   |> List.rev |> List.map string_of_int |> String.concat ","
 
+(*
+while A <> 0
+    B = A mod 8 
+    B = B xor 1
+    C = A >> B
+    A = A >> 3
+    B = B xor C
+    B = B xor 6 
+    out B mod 8
+*)
+
+let get_output a b =
+  let a = Int.shift_left a 3 + b in
+  let b = Int.logxor b 1 in
+  let c = Int.shift_right a b in
+  b |> Int.logxor c |> Int.logxor 6 |> Fun.flip ( mod ) 8
+
+let rec search_digits a digits =
+  let numbers = Seq.ints 0 |> Seq.take 8 in
+  match digits with
+  | [] -> Seq.return a
+  | out :: rest ->
+      let possible = numbers |> Seq.filter @@ fun n -> out = get_output a n in
+      possible
+      |> Seq.map (( + ) (Int.shift_left a 3))
+      |> Seq.flat_map @@ Fun.flip search_digits rest
+
 let _ =
   In_channel.with_open_text "inputs/d17.txt" @@ fun ic ->
   let computer = Seq.read_lines ic |> parse in
-  execute computer |> print_endline
+  execute computer |> print_endline;
+  snd computer |> List.rev |> search_digits 0 |> Seq.uncons |> Option.get |> fst
+  |> string_of_int |> print_endline
