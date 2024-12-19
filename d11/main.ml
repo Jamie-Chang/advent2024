@@ -16,7 +16,7 @@ let blink num =
 
 let solve iters stones =
   let stones = IntCounter.of_value_seq stones in
-  let blink_one = Fun.memo @@ Fun.compose IntCounter.of_value_seq blink in
+  let blink_one = Fun.memo () @@ Fun.compose IntCounter.of_value_seq blink in
   let blink_all stones =
     IntCounter.to_seq stones
     |> Seq.map (fun (k, v) -> IntCounter.(v * blink_one k))

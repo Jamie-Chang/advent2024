@@ -1,9 +1,9 @@
 module Fun = struct
   include Fun
 
-  let memo ?(cache_size = 1000) f =
+  let memo ?(cache_size = 1000) () =
     let cache = Hashtbl.create cache_size in
-    let run v =
+    let run f v =
       match Hashtbl.find_opt cache v with
       | Some res -> res
       | None ->
@@ -47,6 +47,14 @@ module Seq = struct
         Seq.fold_left
           (fun curr next -> if cmp curr next = 1 then next else curr)
           start rest
+
+  let max_opt seq =
+    Seq.fold_left
+      (fun acc v ->
+        match acc with
+        | None -> Some v
+        | Some acc -> if v > acc then Some v else Some acc)
+      None seq
 
   let min_opt seq =
     Seq.fold_left
