@@ -103,10 +103,10 @@ let solve n code =
 
 let _ =
   let lines = [ "140A"; "180A"; "176A"; "805A"; "638A" ] in
-  lines |> List.to_seq
-  |> Seq.map (fun x -> solve 2 x * numeric x)
-  |> Seq.sum |> string_of_int |> print_endline;
+  lines
+  |> List.parmap (fun x -> solve 2 x * numeric x)
+  |> List.to_seq |> Seq.sum |> string_of_int |> print_endline;
 
-  lines |> List.to_seq
-  |> Seq.map (fun x -> solve 25 x * numeric x)
-  |> Seq.sum |> string_of_int |> print_endline
+  lines
+  |> List.parmap (fun x -> solve 25 x * numeric x)
+  |> List.to_seq |> Seq.sum |> string_of_int |> print_endline
