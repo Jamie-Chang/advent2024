@@ -6,7 +6,7 @@ let read_matrix filename =
       |> Seq.map @@ Fun.compose List.of_seq String.to_seq
       |> List.of_seq)
 
-let columns_of matrix = Common.Seq.zip matrix |> Seq.map List.to_seq
+let columns_of matrix = Common.Seq.zip_n matrix |> Seq.map List.to_seq
 
 let pad n seq =
   let padding = Seq.repeat None |> Seq.take n in
@@ -54,7 +54,7 @@ let part2 filename =
   let horizontal_window matrix =
     List.to_seq matrix |> Seq.map List.to_seq
     |> Seq.map (Common.Seq.window 3)
-    |> Common.Seq.zip
+    |> Common.Seq.zip_n
   in
 
   read_matrix filename |> List.to_seq |> Common.Seq.window 3

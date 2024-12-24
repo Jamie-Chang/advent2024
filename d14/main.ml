@@ -70,7 +70,7 @@ let _print_maps n filename =
     |> Seq.map @@ fun robot -> move dimensions robot
   in
   Seq.memoize robot_positions
-  |> Seq.zip |> seq_i
+  |> Seq.zip_n |> seq_i
   |> Seq.take n
   |> Seq.iter @@ fun (i, positions) ->
      print_endline ("=============" ^ string_of_int i ^ "=============");

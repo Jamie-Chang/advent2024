@@ -78,7 +78,7 @@ let dpad_moves (prev, target) =
   |> Seq.map (fun s -> s ^ "A")
   |> Seq.map String.to_seq
 
-let pairwise start seq = Stdlib.Seq.zip (Seq.append (Seq.return start) seq) seq
+let pairwise start seq = Seq.zip (Seq.append (Seq.return start) seq) seq
 
 let numeric s =
   String.split_on_char 'A' s |> Fun.flip List.nth 0 |> int_of_string

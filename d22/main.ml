@@ -16,15 +16,13 @@ let next n =
 
 let rec sequence n () = Seq.Cons (n, sequence (next n))
 let _test = assert (next 123 = 15887950)
-
-let diff seq =
-  Stdlib.Seq.zip (Seq.drop 1 seq) seq |> Seq.map (fun (a, b) -> a - b)
+let diff seq = Seq.zip (Seq.drop 1 seq) seq |> Seq.map (fun (a, b) -> a - b)
 
 let price_changes seq =
   let prices = Seq.map (fun x -> x mod 10) seq in
   let price_change_seq = prices |> diff |> Seq.window 4 in
   let prices = Seq.drop 4 prices in
-  Stdlib.Seq.zip price_change_seq prices
+  Seq.zip price_change_seq prices
 
 let fold_price_changes seq =
   Seq.fold_left

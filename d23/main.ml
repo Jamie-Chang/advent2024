@@ -71,7 +71,6 @@ let part2 filename =
     Seq.read_lines ic |> parse_lines
   in
   Hashtbl.to_seq table
-  |> Seq.filter (fun (key, _) -> String.starts_with ~prefix:"t" key)
   |> Seq.scan
        (fun (seen, _) (key, computers) ->
          ( StringSet.add key seen,

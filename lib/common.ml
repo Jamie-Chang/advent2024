@@ -87,7 +87,7 @@ module Seq = struct
 
     window_rec seq
 
-  let zip seq =
+  let zip_n seq =
     let rec zip_rec seqs () =
       let first seq = Seq.take 1 seq |> List.of_seq in
       let take seqs = seqs |> Seq.map first in
